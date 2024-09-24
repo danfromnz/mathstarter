@@ -1,0 +1,46 @@
+<div id="settings">
+    <!-- Duration Input -->
+    <label for="durationInput">Duration per Question (seconds):</label>
+    <input type="number" id="durationInput" value="7" min="1" max="60">
+
+    <!-- Factor Selection Buttons -->
+    <button id="selectAllButton">Select All</button>
+    <button id="clearAllButton">Clear All</button>
+    <button id="selectRandomButton">Select Random</button>
+    <button id="positivesOnlyButton">Positives Only</button>
+
+    <!-- Factor Checkboxes Layout -->
+    <div id="factorCheckboxesNegative">
+        <h3>Negative Factors and 0</h3>
+        <!-- Negative factors checkboxes will be added here -->
+    </div>
+    <div id="factorCheckboxesPositive">
+        <h3>Positive Factors</h3>
+        <!-- Positive factors checkboxes will be added here -->
+    </div>
+
+    <!-- Start Button -->
+    <button id="goButton">Go</button>
+</div>
+
+<!-- Quiz Display Area -->
+<div id="quizArea">
+    <div id="questionNumber"></div>
+    <div id="questionText"></div>
+    <div id="countdown"></div>
+</div>
+
+<!-- Results Table -->
+<table id="resultTable">
+    <thead>
+        <tr>
+            <th></th> <!-- Empty header for question number -->
+            <th>Question</th>
+            <th>Answer</th>
+        </tr>
+    </thead>
+    <tbody id="resultBody"></tbody>
+</table>
+
+<!-- Restart Button -->
+<button id="restartButton">Restart</button>
