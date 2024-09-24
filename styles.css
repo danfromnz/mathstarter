@@ -1,0 +1,36 @@
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+#settings, #quizArea, #resultTable, #restartButton {
+    margin: 20px auto;
+    max-width: 400px;
+}
+
+#quizArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 2em;
+}
+
+#questionNumber, #questionText {
+    font-size: 2em;
+    margin: 10px 0;
+}
+
+#countdown {
+    font-size: 1.5em;
+    color: gray;
+}
+
+#resultTable {
+    display: none;
+    width: 100%;
+}
+
+#restartButton {
+    display: none;
+    margin-top: 20px;
+}
