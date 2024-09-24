@@ -1,17 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const factorRangeNegative = [...Array(14).keys()].map(i => i - 13); // -13 to 0
-    const factorRangePositive = [...Array(13).keys()].map(i => i + 1);  // 1 to 13
-    const factorCheckboxesNegative = document.getElementById('factorCheckboxesNegative');
-    const factorCheckboxesPositive = document.getElementById('factorCheckboxesPositive');
+    const factorRange = [...Array(27).keys()].map(i => i - 13);
+    const factorCheckboxes = document.getElementById('factorCheckboxes');
     const goButton = document.getElementById('goButton');
     const selectAllButton = document.getElementById('selectAllButton');
     const clearAllButton = document.getElementById('clearAllButton');
     const selectRandomButton = document.getElementById('selectRandomButton');
-    const positivesOnlyButton = document.getElementById('positivesOnlyButton');
-    const durationInput = document.getElementById('durationInput');
     const questionNumberDiv = document.getElementById('questionNumber');
     const questionTextDiv = document.getElementById('questionText');
     const countdownDiv = document.getElementById('countdown');
+    const skipButton = document.getElementById('skipButton');
     const resultTable = document.getElementById('resultTable');
     const resultBody = document.getElementById('resultBody');
     const restartButton = document.getElementById('restartButton');
@@ -19,10 +16,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let questions = [];
     let currentQuestion = 0;
     let countdownInterval;
-    let duration = 7; // Default duration in seconds
 
-    // Create checkboxes for negative and zero factors
-    factorRangeNegative.forEach(factor => {
+    // Create checkboxes for each factor
+    factorRange.forEach(factor => {
         let label = document.createElement('label');
         label.innerText = factor;
         let checkbox = document.createElement('input');
@@ -30,41 +26,24 @@ document.addEventListener('DOMContentLoaded', function () {
         checkbox.value = factor;
         checkbox.checked = true;
         checkbox.addEventListener('change', () => {
-            selectedFactors = getSelectedFactors();
+            selectedFactors = Array.from(document.querySelectorAll('#factorCheckboxes input:checked')).map(cb => parseInt(cb.value));
         });
         label.appendChild(checkbox);
-        factorCheckboxesNegative.appendChild(label);
-    });
-
-    // Create checkboxes for positive factors
-    factorRangePositive.forEach(factor => {
-        let label = document.createElement('label');
-        label.innerText = factor;
-        let checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = factor;
-        checkbox.checked = true;
-        checkbox.addEventListener('change', () => {
-            selectedFactors = getSelectedFactors();
-        });
-        label.appendChild(checkbox);
-        factorCheckboxesPositive.appendChild(label);
+        factorCheckboxes.appendChild(label);
     });
 
     // Initialize selected factors
-    selectedFactors = [...factorRangeNegative, ...factorRangePositive];
+    selectedFactors = factorRange;
 
     // Select All button
     selectAllButton.addEventListener('click', () => {
-        factorCheckboxesNegative.querySelectorAll('input').forEach(cb => cb.checked = true);
-        factorCheckboxesPositive.querySelectorAll('input').forEach(cb => cb.checked = true);
-        selectedFactors = [...factorRangeNegative, ...factorRangePositive];
+        factorCheckboxes.querySelectorAll('input').forEach(cb => cb.checked = true);
+        selectedFactors = factorRange;
     });
 
     // Clear All button
     clearAllButton.addEventListener('click', () => {
-        factorCheckboxesNegative.querySelectorAll('input').forEach(cb => cb.checked = false);
-        factorCheckboxesPositive.querySelectorAll('input').forEach(cb => cb.checked = false);
+        factorCheckboxes.querySelectorAll('input').forEach(cb => cb.checked = false);
         selectedFactors = [];
     });
 
@@ -72,24 +51,12 @@ document.addEventListener('DOMContentLoaded', function () {
     selectRandomButton.addEventListener('click', () => {
         clearAllButton.click();
         const randomCount = Math.floor(Math.random() * 7) + 10; // 10 to 16 factors
-        const shuffledFactors = [...factorRangeNegative, ...factorRangePositive].sort(() => 0.5 - Math.random());
+        const shuffledFactors = factorRange.sort(() => 0.5 - Math.random());
         shuffledFactors.slice(0, randomCount).forEach(factor => {
-            let checkbox = document.querySelector(`input[value="${factor}"]`);
+            let checkbox = factorCheckboxes.querySelector(`input[value="${factor}"]`);
             if (checkbox) checkbox.checked = true;
         });
-        selectedFactors = getSelectedFactors();
-    });
-
-    // Positives Only button
-    positivesOnlyButton.addEventListener('click', () => {
-        clearAllButton.click();
-        factorCheckboxesPositive.querySelectorAll('input').forEach(cb => cb.checked = true);
-        selectedFactors = factorRangePositive;
-    });
-
-    // Update duration based on input
-    durationInput.addEventListener('input', (e) => {
-        duration = parseInt(e.target.value) || 7; // Default to 7 if input is invalid
+        selectedFactors = Array.from(document.querySelectorAll('#factorCheckboxes input:checked')).map(cb => parseInt(cb.value));
     });
 
     // Start quiz
@@ -107,7 +74,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const [a, b] = questions[currentQuestion];
             questionNumberDiv.innerText = `Question ${currentQuestion + 1}`;
             questionTextDiv.innerText = `${a} x ${b}`;
-            startCountdown(duration);
+            skipButton.style.display = 'block'; // Show skip button
+            countdownDiv.style.display = 'block'; // Show countdown
+            startCountdown(7);
         } else {
             showResults();
         }
@@ -122,17 +91,30 @@ document.addEventListener('DOMContentLoaded', function () {
             countdownDiv.innerText = `Next question in: ${countdown} seconds`;
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
-                currentQuestion++;
                 displayNextQuestion();
             }
         }, 1000);
     }
+
+    // Skip countdown
+    skipButton.addEventListener('click', () => {
+        clearInterval(countdownInterval);
+        skipButton.style.display = 'none'; // Hide skip button
+        countdownDiv.style.display = 'none'; // Hide countdown
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            displayNextQuestion();
+        } else {
+            showResults();
+        }
+    });
 
     // Show results
     function showResults() {
         questionNumberDiv.innerText = '';
         questionTextDiv.innerText = '';
         countdownDiv.innerText = '';
+        skipButton.style.display = 'none'; // Hide skip button
         questions.forEach(([a, b], index) => {
             let row = document.createElement('tr');
             let numberCell = document.createElement('td');
@@ -168,11 +150,5 @@ document.addEventListener('DOMContentLoaded', function () {
             questions.push([a, b]);
         }
         return questions;
-    }
-
-    // Get selected factors
-    function getSelectedFactors() {
-        return Array.from(document.querySelectorAll('#factorCheckboxesNegative input:checked, #factorCheckboxesPositive input:checked'))
-            .map(cb => parseInt(cb.value));
     }
 });
